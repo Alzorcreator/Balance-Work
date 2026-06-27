@@ -13,9 +13,8 @@
 </style>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{background:#191919 !important;}
-body{font-family:'Inter',system-ui,sans-serif;color:#f5f5f0;min-height:100vh;}
-@media(prefers-color-scheme:dark){body{color:#f5f5f0;}}
+html,body{background:#191919 !important;margin:0;padding:0;}
+body{font-family:'Inter',system-ui,sans-serif;color:#f5f5f0;}
 :root{
   --surface:rgba(40,40,38,0.95);
   --surface-1:rgba(32,32,30,0.95);
@@ -27,7 +26,13 @@ body{font-family:'Inter',system-ui,sans-serif;color:#f5f5f0;min-height:100vh;}
   --text-muted:#898781;
   --radius:8px;
 }
-.app{padding:1.25rem 1rem;max-width:680px;margin:0 auto;}
+.app{
+  padding:1.25rem 1rem;
+  max-width:680px;
+  margin:0 auto;
+  min-height:100vh;
+  background:#191919;
+}
 .main-card{background:var(--surface);border:0.5px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:1rem;}
 .top-section{display:flex;flex-direction:column;align-items:center;margin-bottom:1.5rem;gap:14px;}
 .top-inner{display:flex;align-items:center;justify-content:center;gap:1.5rem;}
