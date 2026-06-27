@@ -125,15 +125,15 @@ body{font-family:'Inter',system-ui,sans-serif;color:#f5f5f0;}
 
     <div class="bars-section">
       <div>
-        <div class="bar-top"><span class="bar-name purple">Coding</span><span class="bar-val" id="val-coding">0</span></div>
+        <div class="bar-top"><span class="bar-name purple">Coding</span></div>
         <div class="bar-wrap" id="wrap-coding"><canvas id="cv-coding"></canvas></div>
       </div>
       <div>
-        <div class="bar-top"><span class="bar-name blue">Work</span><span class="bar-val" id="val-work">0</span></div>
+        <div class="bar-top"><span class="bar-name blue">Work</span></div>
         <div class="bar-wrap" id="wrap-work"><canvas id="cv-work"></canvas></div>
       </div>
       <div>
-        <div class="bar-top"><span class="bar-name red">Exercise</span><span class="bar-val" id="val-exercise">0</span></div>
+        <div class="bar-top"><span class="bar-name red">Exercise</span></div>
         <div class="bar-wrap" id="wrap-exercise"><canvas id="cv-exercise"></canvas></div>
       </div>
     </div>
@@ -197,17 +197,28 @@ function rand(a,b){return a+Math.random()*(b-a);}
 function setupBar(id){
   const wrap=document.getElementById('wrap-'+id);
   const cv=document.getElementById('cv-'+id);
-  const W=Math.max(wrap.offsetWidth,300);
-  CWS[id]=W;cvs[id]=cv;
-  cv.width=W;cv.height=CH;cv.style.width=W+'px';cv.style.height=CH+'px';
+  cvs[id]=cv;
+  resizeBar(id);
   stars[id]=[];
-  for(let i=0;i<160;i++) stars[id].push({x:rand(0,W),y:rand(0,CH),r:rand(0.2,1.4),op:rand(0.3,0.9),tw:rand(0,Math.PI*2),spd:rand(0.8,2.5)});
   nebulae[id]=[];
+  const W=CWS[id];
+  for(let i=0;i<160;i++) stars[id].push({x:rand(0,W),y:rand(0,CH),r:rand(0.2,1.4),op:rand(0.3,0.9),tw:rand(0,Math.PI*2),spd:rand(0.8,2.5)});
   for(let i=0;i<6;i++) nebulae[id].push({x:rand(0,W),y:rand(0,CH),rx:rand(40,100),ry:rand(10,22),vx:rand(0.2,0.7)*(Math.random()<0.5?1:-1),op:rand(0.06,0.14),phase:rand(0,Math.PI*2)});
+}
+
+function resizeBar(id){
+  const wrap=document.getElementById('wrap-'+id);
+  const cv=cvs[id];if(!cv||!wrap)return;
+  const W=Math.max(wrap.getBoundingClientRect().width||wrap.offsetWidth,100);
+  if(W===CWS[id])return;
+  CWS[id]=W;
+  cv.width=W;cv.height=CH;
+  cv.style.width='100%';cv.style.height=CH+'px';
 }
 
 function drawBar(id,pct,t){
   const cv=cvs[id];if(!cv)return;
+  resizeBar(id);
   const W=CWS[id],H=CH,bar=BARS.find(b=>b.id===id);
   const ctx=cv.getContext('2d'),fw=Math.round((pct/100)*W);
   ctx.clearRect(0,0,W,H);ctx.fillStyle='#06061a';ctx.fillRect(0,0,W,H);
@@ -285,7 +296,6 @@ function setVal(id,newPct){
 
 function updateAll(){
   const used=vals.coding+vals.work+vals.exercise,rem=100-used,z=getZone(rem);
-  BARS.forEach(b=>document.getElementById('val-'+b.id).textContent=vals[b.id]);
   document.getElementById('cpct').textContent=rem+'%';
   const b=document.getElementById('zone-badge');b.style.background=z.bg;b.style.color=z.tc;b.textContent=z.label+' — '+z.tip;
   document.getElementById('amsg').textContent=amsg(rem);
@@ -340,6 +350,11 @@ function animate(){
 
 BARS.forEach(b=>setupBar(b.id));
 updateAll();animate();
+
+if(window.ResizeObserver){
+  const ro=new ResizeObserver(()=>BARS.forEach(b=>resizeBar(b.id)));
+  ro.observe(document.querySelector('.bars-section'));
+}
 
 const panelState={settings:false,history:false};
 function togglePanel(name){
